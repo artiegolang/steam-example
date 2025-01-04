@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: trading_platform_db
+    environment:
+      POSTGRES_DB: trading_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d trading_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: trading_platform_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Добавляем новый сервис для миграций
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile_migrations
+    container_name: trading_platform_migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      GOOSE_DRIVER: postgres
+      # Внутри Docker-сети Postgres доступен по имени "postgres"
+      GOOSE_DBSTRING: "host=postgres user=postgres password=postgres dbname=trading_platform sslmode=disable"
+    volumes:
+      # Прокидываем локальную папку миграций в /migrations внутри контейнера
+      - ./db-service/migrations:/migrations
+    command: "-dir /migrations up"
+
+volumes:
+  postgres_data:
+    name: trading_platform_postgres_data
