@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+
+service Inventory {
+  rpc GetItemPrice(GetItemPriceRequest) returns (GetItemPriceResponse);
+  rpc GetAllItems(GetAllItemsRequest) returns (GetAllItemsResponse);
+  rpc GetAllInventoryInfo(GetAllInventoryInfoRequest) returns (GetAllInventoryInfoResponse);
+  rpc UpdatePrice(UpdatePriceRequest) returns (UpdatePriceResponse);
+  rpc UpdateCountOfItem(UpdateCountOfItemRequest) returns (UpdateCountOfItemResponse);
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+  rpc GetItemByRarity(GetItemByRarityRequest) returns (GetItemByRarityResponse);
+  rpc GetItemsByPrice(GetItemsByPriceRequest) returns (GetItemsByPriceResponse);
+}
+
+message InventoryInfo {
+  string username = 1;
+  int64 user_id = 2;
+  repeated Item items = 3;
+  int64 overall_price = 5;
+}
+
+message InventoryEntities {
+  string item_name = 1;
+  int64 price_of_item = 2;
+  int64 count_of_item = 3;
+  string rarity = 4;
+}
+
+message Item {
+  string item_name = 1;
+  int64 item_id = 2;
+  int64 item_price = 3;
+  int64 item_count = 4;
+  string rarity = 5;
+}
+
+message CreateItemRequest {
+  string item_name = 1;
+  int64 item_id = 2;
+  int64 item_price = 3;
+  int64 item_count = 4;
+}
+
+message CreateItemResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message UpdatePriceRequest {
+  int64 item_id = 1;
+  int64 price = 2;
+}
+
+message UpdatePriceResponse {
+}
+
+message UpdateCountOfItemRequest {
+  int64 user_id = 1;
+  int64 item_id = 2;
+  int64 new_count = 3;
+}
+
+message UpdateCountOfItemResponse {
+}
+
+message GetItemPriceRequest {
+  string item_name = 1;
+}
+
+message GetItemPriceResponse {
+  int64 item_price = 1;
+}
+
+message GetItemByRarityRequest {
+  string rarity = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetItemByRarityResponse {
+  repeated Item items = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetItemsByPriceRequest {
+  int64 starting_price = 1;
+  int64 highest_price = 2;
+  int32 page_size = 3;
+  int32 page_number = 4;
+}
+
+message GetItemsByPriceResponse {
+  repeated Item items = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetAllItemsRequest {
+  int64 user_id = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetAllItemsResponse {
+  repeated Item items = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+  int32 total_items = 4;
+}
+
+message GetAllInventoryInfoRequest {
+  int64 user_id = 1;
+}
+
+message GetAllInventoryInfoResponse {
+  string username = 1;
+  int64 user_id = 2;
+  int64 number_of_items = 3;
+  repeated Item items = 4;
+  int64 overall_price = 5;
+}
+
+message DeleteItemRequest {
+  int64 user_id = 1;
+  int64 item_id = 2;
+}
+
+message DeleteItemResponse {
+}
+
+
+

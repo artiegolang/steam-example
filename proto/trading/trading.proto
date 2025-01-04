@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service Trading {
+  rpc CreateTrade(CreateTradeRequest) returns (CreateTradeResponse);
+  rpc AcceptTrade(AcceptTradeRequest) returns (AcceptTradeResponse);
+  rpc DeclineTrade(DeclineTradeRequest) returns (DeclineTradeResponse);
+  rpc GetTrade(GetTradeRequest) returns (GetTradeResponse);
+  rpc GetAllTrades(GetAllTradesRequest) returns (GetAllTradesResponse);
+  rpc GetHistoryOfTrades(GetHistoryOfTradesRequest) returns (GetHistoryOfTradesResponse);
+  rpc GetTradesByStatus(GetTradesByStatusRequest) returns (GetTradesByStatusResponse);
+  rpc DeleteTrade(DeleteTradeRequest) returns (DeleteTradeResponse);
+}
+
+message Item {
+  string item_name = 1;
+  int64 item_id = 2;
+  int64 item_price = 3;
+  int64 item_count = 4;
+  string rarity = 5;
+}
+
+message Trade {
+  int64 trade_id = 1;
+  string trade_description = 2;
+  int64 trade_creator_id = 3;
+  int64 trade_receiver_id = 4;
+  enum TradeStatus {
+    PENDING = 0;
+    ACCEPTED = 1;
+    DECLINED = 2;
+    CANCELLED = 3;
+    COMPLETED = 4;
+  }
+  TradeStatus trade_status = 5;
+  google.protobuf.Timestamp trade_date = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  int64 total_price = 8;
+  repeated Item items = 9;
+}
+
+message CreateTradeRequest {
+  string trade_description = 1;
+  int64 trade_creator_id = 2;
+  int64 trade_receiver_id = 3;
+  repeated Item items = 4;
+  int64 total_price = 5;
+}
+
+message CreateTradeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message AcceptTradeRequest {
+  int64 trade_id = 1;
+  int64 trade_receiver_id = 2;
+  int64 confirmed_total_price = 3;  // Для проверки, что цена не изменилась
+}
+
+message AcceptTradeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetTradeRequest {
+  int64 trade_id = 1;
+}
+
+message GetTradeResponse {
+  Trade trade = 1;
+}
+
+message GetAllTradesRequest {
+  int64 user_id = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetAllTradesResponse {
+  repeated Trade trades = 1;
+  int32 total_items = 2;
+  int32 page_size = 3;
+  int32 page_number = 4;
+}
+
+message DeleteTradeRequest {
+  int64 trade_id = 1;
+}
+
+message DeleteTradeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetHistoryOfTradesRequest {
+  int64 user_id = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetHistoryOfTradesResponse {
+  repeated Trade trades = 1;
+  int32 total_items = 2;
+  int32 page_size = 3;
+  int32 page_number = 4;
+}
+
+message DeclineTradeRequest {
+  int64 trade_id = 1;
+  int64 trade_receiver_id = 2;
+}
+
+message DeclineTradeResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetTradesByStatusRequest {
+  Trade.TradeStatus status = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetTradesByStatusResponse {
+  repeated Trade trades = 1;
+  int32 total_items = 2;
+  int32 page_size = 3;
+  int32 page_number = 4;
+}

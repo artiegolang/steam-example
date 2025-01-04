@@ -1,0 +1,179 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetAllUsers(GetAllUsersRequest) returns (GetAllUsersResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse);
+  rpc UpdateBalance(UpdateBalanceRequest) returns (UpdateBalanceResponse);
+  rpc AddBalance(AddBalanceRequest) returns (UpdateBalanceResponse);
+  rpc WithdrawBalance(WithdrawBalanceRequest) returns (UpdateBalanceResponse);
+  rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse);
+}
+
+message User {
+  int64 user_id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  enum Role {
+    ADMIN = 0;
+    USER = 1;
+  }
+  Role role = 5;
+  enum Status {
+    ACTIVE = 0;
+    BLOCKED = 1;
+    DELETED = 2;
+  }
+  Status status = 6;
+  int64 balance = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message Trade {
+  int64 trade_id = 1;
+  string trade_description = 2;
+  int64 trade_creator_id = 3;
+  int64 trade_receiver_id = 4;
+  enum TradeStatus {
+    PENDING = 0;
+    ACCEPTED = 1;
+    DECLINED = 2;
+    CANCELLED = 3;
+    COMPLETED = 4;
+  }
+  TradeStatus trade_status = 5;
+  google.protobuf.Timestamp trade_date = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  int64 total_price = 8;
+  repeated Item items = 9;
+}
+
+message Item {
+  string item_name = 1;
+  int64 item_id = 2;
+  int64 item_price = 3;
+  int64 item_count = 4;
+  string rarity = 5;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  User.Role role = 4;
+}
+
+message CreateUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message GetAllUsersRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+  optional string username_filter = 3;
+  optional User.Status status_filter = 4;
+}
+
+message GetAllUsersResponse {
+  repeated User users = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message UpdateUserRequest {
+  int64 user_id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  User.Role role = 5;
+}
+
+message UpdateUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteUserRequest {
+  int64 user_id = 1;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string message = 2;
+  google.protobuf.StringValue token = 3;
+  User.Role role = 4;
+  int64 user_id = 5;
+  string username = 6;
+}
+
+message GetBalanceRequest {
+  int64 user_id = 1;
+}
+
+message GetBalanceResponse {
+  int64 balance = 1;
+}
+
+message UpdateBalanceRequest {
+  int64 user_id = 1;
+  int64 new_balance = 2;
+}
+
+message UpdateBalanceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message AddBalanceRequest {
+  int64 user_id = 1;
+  int64 amount = 2;
+}
+
+message WithdrawBalanceRequest {
+  int64 user_id = 1;
+  int64 amount = 2;
+}
+
+message UpdatePasswordRequest {
+  int64 user_id = 1;
+  string old_password = 2;
+  string new_password = 3;
+}
+
+message UpdatePasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+
