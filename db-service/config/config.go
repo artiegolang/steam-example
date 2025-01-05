@@ -1,8 +1,8 @@
 package config
 
 type Config struct {
-	Log      LogConfig
 	Postgres PostgresConfig
+	Log      LogConfig
 }
 
 type LogConfig struct {

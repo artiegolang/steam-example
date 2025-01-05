@@ -30,6 +30,7 @@ var (
 )
 
 func InitLogger(cfg config.LogConfig) {
+	// Предыдущий код остается таким же
 	encoderConfig := zap.NewDevelopmentEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
@@ -55,12 +56,16 @@ func InitLogger(cfg config.LogConfig) {
 		ErrorOutputPaths: []string{"stderr"},
 	}
 
-	logger, err := config.Build()
+	zapLogger, err := config.Build()
 	if err != nil {
 		panic("failed to initialize logger: " + err.Error())
 	}
 
-	globalLogger = &ZapLogger{log: logger}
+	// Создаем наш логгер
+	globalLogger = &ZapLogger{log: zapLogger}
+
+	// Устанавливаем его как глобальный
+	logger.SetLogger(globalLogger)
 }
 
 func GetLogger() logger.Logger {
