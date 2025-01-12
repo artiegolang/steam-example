@@ -21,7 +21,6 @@ func NewItemUseCase(repo interfaces.ItemRepository) *ItemUseCase {
 }
 
 func (i *ItemUseCase) CreateItem(ctx context.Context, req *inventory.CreateItemRequest) error {
-	// Basic validation
 	if req.ItemName == "" {
 		logger.Error("attempt to create item with empty name")
 		return fmt.Errorf("item name cannot be empty")

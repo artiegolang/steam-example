@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -10,6 +11,7 @@ import (
 	"petProject/proto/inventory"
 	"petProject/proto/trading"
 	"petProject/proto/user"
+	"time"
 )
 
 type Server struct {
@@ -27,8 +29,11 @@ func NewServer(port string) (*Server, error) {
 		return nil, fmt.Errorf("failed to listen on port %s: %v", port, err)
 	}
 
-	// Создаём новый gRPC сервер
-	s := grpc.NewServer()
+	// Создаём gRPC сервер с опциями
+	opts := []grpc.ServerOption{
+		grpc.UnaryInterceptor(serverInterceptor()),
+	}
+	s := grpc.NewServer(opts...)
 
 	return &Server{
 		listener: listener,
@@ -36,12 +41,31 @@ func NewServer(port string) (*Server, error) {
 	}, nil
 }
 
+// Middleware для логирования и обработки ошибок
+func serverInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		logger.Debug("Incoming request",
+			zap.String("method", info.FullMethod),
+			zap.Any("request", req))
+
+		resp, err := handler(ctx, req)
+
+		logger.Debug("Request completed",
+			zap.String("method", info.FullMethod),
+			zap.Duration("duration", time.Since(start)),
+			zap.Error(err))
+
+		return resp, err
+	}
+}
+
 // RegisterServices регистрирует все сервисы в gRPC сервере
 func (s *Server) RegisterServices(
 	userUseCase interfaces.UserUseCase,
 	inventoryUseCase interfaces.InventoryUseCase,
 	itemUseCase interfaces.ItemUseCase,
-	tradingUseCase interfaces.TradingUseCase, // Предполагается, что интерфейс называется TradingUseCase
+	tradingUseCase interfaces.TradeUseCase,
 ) {
 	// Создаём экземпляры сервисов
 	s.userService = NewUserService(userUseCase)
